@@ -1,12 +1,12 @@
 import { Personaje } from '../personaje.js';
 
-export class Guerrero extends Personaje {
+export class Arquero extends Personaje {
     constructor(nombre) {
-        super(nombre, 'Guerrero', 120, 15, 10, 5);
+        super(nombre, 'Arquero', 100, 12, 8, 10);
     }
 
     habilidadEspecial(objetivo) {
-        const danio = this.fuerza * 2;
+        const danio = this.fuerza + this.magia;
         return objetivo.recibirDanio(danio);
     }
 }
