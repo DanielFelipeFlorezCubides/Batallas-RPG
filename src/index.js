@@ -4,11 +4,13 @@ import figlet from 'figlet';
 import gradient from 'gradient-string';
 import boxen from 'boxen';
 import ora from 'ora';
-
+// Importaciones adicionales
 import { GestorPersonajes } from './services/personajes/GestorPersonajes.js';
+import { Arma } from './models/objetos/Arma.js';
+import { Pocion } from './models/objetos/Pocion.js';
+import { Armadura } from './models/objetos/Armadura.js';
 
 const gestor = new GestorPersonajes();
-
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function showTitle() {
@@ -40,6 +42,12 @@ async function crearPersonaje() {
     const spinner = ora('Creando personaje...').start();
     await delay(1000);
     gestor.crearPersonaje(respuestas.nombre, respuestas.clase);
+    // Obtenemos el último personaje creado
+    const personaje = gestor.personajes.at(-1);
+    // Poblamos el inventario con objetos de prueba
+    personaje.agregarObjeto(new Arma('Espada Oxidada', 5));
+    personaje.agregarObjeto(new Pocion('Poción Pequeña', 30));
+    personaje.agregarObjeto(new Armadura('Escudo Viejo', 3));
     spinner.succeed(chalk.green('✅ ¡Personaje creado correctamente!'));
 }
 
@@ -91,6 +99,47 @@ async function verDetalles() {
     ));
 }
 
+async function usarObjeto() {
+    const lista = gestor.listarPersonajes();
+    if (lista.length === 0) {
+        console.log(chalk.red('❌ No hay personajes aún.'));
+        return;
+    }
+
+    const { seleccionado } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'seleccionado',
+            message: chalk.cyan('Selecciona un personaje:'),
+            choices: lista
+        }
+    ]);
+
+    const nombre = seleccionado.split(' ')[0];
+    const personaje = gestor.personajes.find(p => p.nombre === nombre);
+
+    if (personaje.inventario.length === 0) {
+        console.log(chalk.yellow('🎒 Este personaje no tiene objetos.'));
+        return;
+    }
+
+    const { objetoNombre } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'objetoNombre',
+            message: chalk.magenta('Selecciona el objeto que deseas usar:'),
+            choices: personaje.inventario.map(obj => obj.nombre)
+        }
+    ]);
+
+    const index = personaje.inventario.findIndex(obj => obj.nombre === objetoNombre);
+    if (index !== -1) {
+        personaje.inventario[index].usar(personaje);
+        personaje.inventario.splice(index, 1);
+        console.log(chalk.green(`✅ ¡Objeto "${objetoNombre}" usado con éxito!`));
+    }
+}
+
 async function menuPrincipal() {
     await showTitle();
 
@@ -103,6 +152,7 @@ async function menuPrincipal() {
                 '🆕 Crear personaje',
                 '📋 Ver personajes',
                 '🔍 Ver detalles de personaje',
+                '🎒 Usar objeto del inventario',
                 '❌ Salir'
             ]
         }
@@ -118,19 +168,28 @@ async function menuPrincipal() {
         case '🔍 Ver detalles de personaje':
             await verDetalles();
             break;
+        case '🎒 Usar objeto del inventario':
+            await usarObjeto();
+            break;
         case '❌ Salir':
             console.log(chalk.green('\n👋 ¡Hasta la próxima, aventurero!\n'));
             process.exit();
     }
 
-    await inquirer.prompt({
+    const { continuar } = await inquirer.prompt({
         type: 'confirm',
         name: 'continuar',
         message: '¿Volver al menú?',
         default: true
     });
 
-    await menuPrincipal();
+    if (continuar) {
+        await menuPrincipal();
+    } else {
+        console.log(chalk.green('\n👋 ¡Hasta la próxima, aventurero!\n'));
+        process.exit();
+    }
+
 }
 
 menuPrincipal();
