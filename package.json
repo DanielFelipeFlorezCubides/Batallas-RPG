@@ -1,0 +1,11 @@
+{
+  "name": "batallas-rpg",
+  "version": "1.0.0",
+  "description": "Proyecto academico basado en un juego sencillo rpg por consola",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Florez - Mateo Paternina",
+  "license": "MIT"
+}
