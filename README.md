@@ -186,7 +186,7 @@ src/
 
 ## 🧬 Diagrama UML
 
-📷 Puedes ver el diagrama aquí: ![alt text](<Diagrama UML - Segunda parte.png>)
+📷 Puedes ver el diagrama aquí: ![Diagrama](<Diagrama UML - Segunda parte.png>)
 
 
 ---
@@ -201,3 +201,9 @@ src/
 ---
 
 🎮 Proyecto desarrollado en Node.js con módulos ES y herramientas de consola como Inquirer, Chalk y Figlet.
+
+---
+
+📺 Mira cómo funciona el proyecto:
+
+🔗 [Ver video en YouTube](https://youtu.be/WGhLpIh2RKs)
