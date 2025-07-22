@@ -5,10 +5,6 @@
 ### 🧩 Estructura de Archivos (Jugador 1)
 
 ```
-bash
-
-
-CopyEdit
 src/
 ├── models/
 │   ├── Personaje.js
@@ -119,3 +115,89 @@ Luigi usará este módulo en el flujo general del juego (ver personajes, selecci
 - No requiere BD, guarda todo en memoria (o archivos JSON si se extiende)
 
 ![Diagrama UML primera parte](./Diagrama%20UML%20-%20Primera%20parte.png)
+
+--- 
+
+# 🧙‍♂️ Parte 2 – Luigi: Sistema de Batalla, Enemigos y Flujo
+
+Este módulo implementa el sistema de combate del juego RPG, incluyendo enemigos generados por IA, lógica de turnos y la ejecución del flujo principal del juego en consola.
+
+---
+
+## 📁 Estructura de Archivos
+```
+src/
+
+├── index.js                        # Flujo principal del juego y menú
+├── services/
+│   ├── batalla/
+│   │   └── Batalla.js              # Lógica de combate por turnos
+│   ├── ia/
+│   │   ├── Enemigo.js              # Clase Enemigo que extiende Personaje
+│   │   └── FabricaEnemigos.js     # Generador aleatorio de enemigos
+```
+---
+
+## ⚔️ Funcionalidades
+
+✔ Combate por turnos entre un personaje y un enemigo
+
+✔ IA que responde automáticamente luego del turno del jugador
+
+✔ Enemigos con fuerza, magia y habilidades
+
+✔ Finalización de batalla y anuncio del ganador
+
+✔ Compatible con sistema de personajes de Mario (Jugador 1)
+
+---
+
+## 🔄 Flujo de Combate
+
+1. El usuario selecciona “⚔️ Iniciar batalla” en el menú.
+2. Elige un personaje creado previamente.
+3. Se genera un enemigo aleatorio (Goomba, Koopa, Magikoopa).
+4. Turno del jugador: ataca o usa habilidad.
+5. Turno automático del enemigo.
+6. El ciclo se repite hasta que alguien pierde toda su salud.
+7. Se muestra al ganador.
+
+---
+
+## 👾 IA de Enemigos
+
+- Controlada por lógica aleatoria (70% ataque básico, 30% habilidad especial).
+- Se puede extender a lógica más compleja (comportamientos según salud o defensa).
+- Habilidad especial inflige daño adicional basado en fuerza + magia.
+
+---
+
+## 🧠 Principios SOLID aplicados
+
+| Principio | Aplicación |
+| --- | --- |
+| SRP | Batalla, Enemigo y Fábrica cumplen funciones únicas. |
+| OCP | Se pueden agregar nuevos tipos de enemigos sin tocar los existentes. |
+| LSP | Enemigo se comporta como Personaje. |
+| ISP | Clases no dependen de métodos que no usan. |
+| DIP | Batalla depende de Personaje y Enemigo como abstracciones. |
+
+---
+
+## 🧬 Diagrama UML
+
+📷 Puedes ver el diagrama aquí: ![alt text](<Diagrama UML - Segunda parte.png>)
+
+
+---
+
+## 🛠️ Mejoras futuras
+
+- Sistema de experiencia y niveles al ganar batallas
+- Soporte para múltiples enemigos y personajes en combate
+- Implementación de estados (veneno, aturdimiento, etc.)
+- Persistencia de personajes e inventario con JSON o lowdb
+
+---
+
+🎮 Proyecto desarrollado en Node.js con módulos ES y herramientas de consola como Inquirer, Chalk y Figlet.

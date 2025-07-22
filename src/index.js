@@ -9,6 +9,8 @@ import { GestorPersonajes } from './services/personajes/GestorPersonajes.js';
 import { Arma } from './models/objetos/Arma.js';
 import { Pocion } from './models/objetos/Pocion.js';
 import { Armadura } from './models/objetos/Armadura.js';
+import { FabricaEnemigos } from './services/ia/FabricaEnemigos.js';
+import { Batalla } from './services/batalla/Batalla.js';
 
 const gestor = new GestorPersonajes();
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -140,6 +142,61 @@ async function usarObjeto() {
     }
 }
 
+async function iniciarBatalla() {
+    const lista = gestor.listarPersonajes();
+    if (lista.length === 0) {
+        console.log(chalk.red('❌ No hay personajes creados.'));
+        return;
+    }
+
+    const { personajeSeleccionado } = await inquirer.prompt([
+        {
+            type: 'list',
+            name: 'personajeSeleccionado',
+            message: 'Elige a tu luchador:',
+            choices: lista
+        }
+    ]);
+
+    const nombre = personajeSeleccionado.split(' ')[0];
+    const jugador = gestor.personajes.find(p => p.nombre === nombre);
+    const enemigo = FabricaEnemigos.generarAleatorio();
+
+    console.log('Tipo de enemigo:', typeof enemigo.habilidadEspecial);
+    console.log(chalk.yellow(`\n🆚 ¡Comienza la batalla contra ${ enemigo.nombre }!\n`));
+
+    // ✅ Declaramos correctamente la batalla
+    const batalla = new Batalla(jugador, enemigo);
+
+    while (!batalla.estaFinalizada()) {
+        // Turno del jugador
+        const { accion } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'accion',
+                message: 'Tu turno. ¿Qué deseas hacer?',
+                choices: ['atacar', 'habilidad']
+            }
+        ]);
+        batalla.turnoJugador(accion);
+
+
+        // Verificar si enemigo sigue con vida
+        if (!batalla.estaFinalizada()) {
+            console.log(chalk.gray('\n⏳ El enemigo se prepara para responder...\n'));
+            await new Promise(r => setTimeout(r, 1000));
+            batalla.turnoEnemigo();
+        }
+
+        // Estado actual de la batalla
+        console.log(chalk.blue(`\n❤️ ${jugador.nombre}: ${jugador.saludActual}/${jugador.saludMax}`));
+        console.log(chalk.red(`💀 ${enemigo.nombre}: ${enemigo.saludActual}/${enemigo.saludMax}\n`));
+    }
+
+    const ganador = batalla.obtenerGanador();
+    console.log(chalk.greenBright(`🏁 ¡${ ganador } ha ganado la batalla!\n`));
+}
+
 async function menuPrincipal() {
     await showTitle();
 
@@ -153,6 +210,7 @@ async function menuPrincipal() {
                 '📋 Ver personajes',
                 '🔍 Ver detalles de personaje',
                 '🎒 Usar objeto del inventario',
+                '⚔️ Iniciar batalla',
                 '❌ Salir'
             ]
         }
@@ -170,6 +228,9 @@ async function menuPrincipal() {
             break;
         case '🎒 Usar objeto del inventario':
             await usarObjeto();
+            break;
+        case '⚔️ Iniciar batalla':
+            await iniciarBatalla();
             break;
         case '❌ Salir':
             console.log(chalk.green('\n👋 ¡Hasta la próxima, aventurero!\n'));
@@ -191,5 +252,7 @@ async function menuPrincipal() {
     }
 
 }
+
+
 
 menuPrincipal();
